@@ -1,9 +1,15 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Description } from "./Description";
 import { AnimatePresence } from "framer-motion";
+import deleteTask from "../handlers/deleteTask"; // ✅ Delete handler
+import FilterBar from "../components/Filterbar"; // ✅ FilterBar import
+import ConfirmDialog from "../components/ConfirmDialog"; // adjust path
+// import { deleteTask } from "../api/deleteTask"; // your delete function
+
 
 
 
@@ -12,10 +18,9 @@ const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selectedTask, setSelectedTask] = useState(null); // ✅ ADD
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   
-const [showModal, setShowModal] = useState(false);
-
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -24,7 +29,6 @@ const [showModal, setShowModal] = useState(false);
             Authorization: `Bearer ${user?.token}`,
           },
         });
-
         setTasks(res.data.tasks);
       } catch (err) {
         console.error("Failed to fetch tasks", err);
@@ -33,25 +37,6 @@ const [showModal, setShowModal] = useState(false);
 
     fetchTasks();
   }, [user]);
-
- 
-
-
-
-  const handleDelete = async (taskId) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
-
-    try {
-      await axios.delete(`http://localhost:1000/api/tasks/${taskId}`, {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
-      });
-      setTasks(tasks.filter((task) => task._id !== taskId));
-    } catch (err) {
-      console.error("Failed to delete task", err);
-    }
-  };
 
   const filteredTasks = tasks.filter((task) => {
     const matchesTitle = task.title.toLowerCase().includes(search.toLowerCase());
@@ -63,27 +48,13 @@ const [showModal, setShowModal] = useState(false);
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-blue-950 p-6 text-white">
       <h1 className="text-3xl font-bold text-center mb-8">📝 Task Dashboard</h1>
 
-      {/* Filter/Search UI */}
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
-        <input
-          type="text"
-          placeholder="🔍 Search by title..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="p-3 rounded w-full md:w-2/3 bg-gray-800 border border-gray-600 placeholder-gray-400 text-white transition duration-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none hover:border-indigo-400"
-        />
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="p-3 rounded w-full md:w-1/3 bg-gray-800 border border-gray-600 text-white transition duration-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none hover:border-indigo-400"
-        >
-          <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="in-progress">In Progress</option>
-          <option value="completed">Completed</option>
-        </select>
-      </div>
+      {/* ✅ Filter Bar Component */}
+      <FilterBar
+        search={search}
+        setSearch={setSearch}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+      />
 
       {/* Tasks Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -108,20 +79,17 @@ const [showModal, setShowModal] = useState(false);
               </span>
             </p>
 
-            {/* Show Description Button */}
             <button
-  onClick={(e) => {
-    e.stopPropagation();
-    setSelectedTask(task);
-    setShowModal(true);
-  }}
-  className="mt-3 mb-2 px-3 py-1 text-sm bg-indigo-700 hover:bg-indigo-600 rounded transition-transform duration-200 hover:scale-105"
->
-  Show Description
-</button>
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedTask(task);
+                setShowModal(true);
+              }}
+              className="mt-3 mb-2 px-3 py-1 text-sm bg-indigo-700 hover:bg-indigo-600 rounded transition-transform duration-200 hover:scale-105"
+            >
+              Show Description
+            </button>
 
-
-            {/* Action Buttons */}
             <div className="mt-4 flex gap-2">
               <Link
                 to={`/edit/${task._id}`}
@@ -133,7 +101,7 @@ const [showModal, setShowModal] = useState(false);
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDelete(task._id);
+                  deleteTask(task._id, user, tasks, setTasks);
                 }}
                 className="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-sm transform transition-transform duration-200 hover:scale-105"
               >
@@ -144,13 +112,11 @@ const [showModal, setShowModal] = useState(false);
         ))}
       </div>
 
-      
       <AnimatePresence>
-  {showModal && selectedTask && (
-    <Description task={selectedTask} onClose={() => setShowModal(false)} />
-  )}
-</AnimatePresence>
-
+        {showModal && selectedTask && (
+          <Description task={selectedTask} onClose={() => setShowModal(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

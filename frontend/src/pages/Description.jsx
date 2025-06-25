@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 
 export const Description = ({ task, onClose }) => {
+  // 👇 Disable background scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30"
@@ -10,7 +19,7 @@ export const Description = ({ task, onClose }) => {
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg shadow-xl p-6 max-w-md w-full relative"
+        className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg shadow-xl p-6 max-w-md w-full relative overflow-y-auto max-h-[80vh]"
         initial={{ scale: 0.8, y: -50 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.8, y: -50 }}
