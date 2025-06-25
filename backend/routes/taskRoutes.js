@@ -4,6 +4,7 @@ import {
   getTasks,
   updateTask,
   deleteTask,
+  getTaskById
 } from '../controllers/taskController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -14,6 +15,7 @@ router.route('/')
   .get(protect, getTasks);
 
 router.route('/:id')
+  .get(protect, getTaskById)
   .put(protect, updateTask)
   .delete(protect, deleteTask);
 
