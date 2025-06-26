@@ -1,7 +1,9 @@
 import axios from "axios";
 
-export const deleteTask = async (taskId, token, setTasks) => {
-  if (!window.confirm("Are you sure you want to delete this task?")) return;
+export const deleteTask = async (taskId, user, setTasks) => {
+  const token = user.token;
+  console.log(token)
+ 
 
   try {
     await axios.delete(`http://localhost:1000/api/tasks/${taskId}`, {

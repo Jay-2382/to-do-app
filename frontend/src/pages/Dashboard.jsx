@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -8,10 +7,6 @@ import { AnimatePresence } from "framer-motion";
 import deleteTask from "../handlers/deleteTask"; // ✅ Delete handler
 import FilterBar from "../components/Filterbar"; // ✅ FilterBar import
 import ConfirmDialog from "../components/ConfirmDialog"; // adjust path
-// import { deleteTask } from "../api/deleteTask"; // your delete function
-
-
-
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -20,7 +15,9 @@ const Dashboard = () => {
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
@@ -39,7 +36,9 @@ const Dashboard = () => {
   }, [user]);
 
   const filteredTasks = tasks.filter((task) => {
-    const matchesTitle = task.title.toLowerCase().includes(search.toLowerCase());
+    const matchesTitle = task.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
     const matchesStatus = statusFilter ? task.status === statusFilter : true;
     return matchesTitle && matchesStatus;
   });
@@ -63,7 +62,9 @@ const Dashboard = () => {
             key={task._id}
             className="bg-gray-800 hover:bg-gray-700 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100 rounded-xl p-5 border border-gray-600 shadow-lg cursor-pointer"
           >
-            <h2 className="text-lg font-semibold text-white mb-2">{task.title}</h2>
+            <h2 className="text-lg font-semibold text-white mb-2">
+              {task.title}
+            </h2>
             <p className="text-sm">
               <span
                 className={`inline-block px-2 py-1 rounded text-xs font-semibold 
@@ -98,10 +99,12 @@ const Dashboard = () => {
               >
                 ✏️ Edit
               </Link>
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteTask(task._id, user, tasks, setTasks);
+                  setSelectedTaskId(task._id);
+                  setShowConfirm(true); // show modal
                 }}
                 className="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-sm transform transition-transform duration-200 hover:scale-105"
               >
@@ -114,9 +117,27 @@ const Dashboard = () => {
 
       <AnimatePresence>
         {showModal && selectedTask && (
-          <Description task={selectedTask} onClose={() => setShowModal(false)} />
+          <Description
+            task={selectedTask}
+            onClose={() => setShowModal(false)}
+          />
         )}
       </AnimatePresence>
+      <ConfirmDialog
+        isOpen={showConfirm}
+        message="Are you sure you want to delete this task?"
+        onCancel={() => {
+          setShowConfirm(false);
+          setSelectedTaskId(null);
+        }}
+        onConfirm={async () => {
+          setShowConfirm(false);
+          if (selectedTaskId) {
+            await deleteTask(selectedTaskId, user, setTasks);
+            setSelectedTaskId(null);
+          }
+        }}
+      />
     </div>
   );
 };
