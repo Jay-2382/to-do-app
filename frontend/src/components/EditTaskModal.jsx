@@ -1,15 +1,41 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { motion } from "framer-motion";
 
 const EditTaskModal = ({ task, onClose, setTasks, user }) => {
   const [formData, setFormData] = useState({
-    title: task?.title || "",
-    status: task?.status || "pending",
-    description: task?.description || "",
+    title: task.title,
+    description: task.description || "",
+    status: task.status,
   });
 
-  const [showDescription, setShowDescription] = useState(true);
+  const modalRef = useRef(null);
+
+  // Disable dashboard scroll when modal is active
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  // Close modal on outside click
+  useEffect(() => {
+  const handleOutsideClick = (e) => {
+    if (
+      modalRef.current &&
+      !modalRef.current.contains(e.target) &&
+      e.target instanceof Node &&
+      document.body.contains(e.target) // ensures click is inside actual DOM
+    ) {
+      onClose();
+    }
+  };
+
+  document.addEventListener("pointerdown", handleOutsideClick);
+  return () => document.removeEventListener("pointerdown", handleOutsideClick);
+}, [onClose]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,116 +44,106 @@ const EditTaskModal = ({ task, onClose, setTasks, user }) => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    if (!task?._id) return console.error("Invalid task");
-
     try {
       const res = await axios.put(
         `http://localhost:1000/api/tasks/${task._id}`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${user?.token}`,
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
           },
         }
       );
-
-      const updated = res.data;
-
-if (updated) {
-  setTasks((prev) =>
-    prev.map((t) => (t._id === task._id ? updated : t))
-  );
-  onClose(); // close modal
-}
-
+      setTasks((prev) => prev.map((t) => (t._id === task._id ? res.data : t)));
+      onClose();
     } catch (err) {
-      console.error("Update failed:", err?.response?.data || err.message);
+      console.error("Failed to update task:", err);
     }
   };
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
+    <AnimatePresence>
       <motion.div
-        className="bg-gray-900 text-white p-6 rounded-2xl shadow-2xl w-full max-w-md"
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 100, opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center  bg-black/30"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
       >
-        <h2 className="text-xl font-bold mb-4">✏️ Edit Task</h2>
+        {/* Modal Background */}
+        <motion.div
+          className="absolute inset-0 bg-gray-700"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.8 }}
+          exit={{ opacity: 0 }}
+        />
 
-        <form onSubmit={handleUpdate} className="space-y-4">
-          <div>
-            <label className="block text-sm mb-1">Title</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
-              required
-            >
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowDescription((prev) => !prev)}
-            className="text-sm text-indigo-400 underline hover:text-indigo-300"
-          >
-            {showDescription ? "Hide Description" : "Show Description"}
-          </button>
-
-          {showDescription && (
+        {/* Modal Content */}
+        <motion.div
+          ref={modalRef}
+          className="bg-gradient-to-br dark:bg-gray-900 text-white rounded-md p-6 w-full max-w-3xl z-10 shadow-xl overflow-y-auto max-h-[90vh]"
+          initial={{ y: "-100vh", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "100vh", opacity: 0 }}
+        >
+          <h2 className="text-xl font-bold mb-4">Edit Task</h2>
+          <form onSubmit={handleUpdate} className="space-y-4">
             <div>
-              <label className="block text-sm mb-1">Description</label>
-              <textarea
-                name="description"
-                rows="3"
-                value={formData.description}
+              <label className="block font-medium mb-1">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
                 onChange={handleChange}
-                className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none"
+                className="w-full bg-gray-800 text-white border border-gray-600 px-4 py-2 rounded"
+                required
               />
             </div>
-          )}
 
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500"
-            >
-              Update
-            </button>
-          </div>
-        </form>
+            <div>
+              <label className="block font-medium mb-1">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={3}
+                className="w-full bg-gray-800 text-white border border-gray-600 px-4 py-2 rounded resize-none overflow-y-auto transition-all duration-300 max-h-[300px]"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full bg-gray-800 text-white border border-gray-600 px-4 py-2 rounded"
+                required
+              >
+                <option value="pending">Pending</option>
+                <option value="in progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-4 pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded"
+              >
+                Update
+              </button>
+            </div>
+          </form>
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </AnimatePresence>
   );
 };
 

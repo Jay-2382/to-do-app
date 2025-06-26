@@ -19,7 +19,7 @@ export const Description = ({ task, onClose }) => {
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg shadow-xl p-6 max-w-md w-full relative overflow-y-auto max-h-[80vh]"
+        className="bg-white dark:bg-gray-900 text-black dark:text-white rounded-lg shadow-xl p-6 max-w-2xl w-full relative overflow-y-auto max-h-[80vh]"
         initial={{ scale: 0.8, y: -50 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.8, y: -50 }}

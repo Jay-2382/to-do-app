@@ -40,76 +40,77 @@ const Dashboard = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-blue-950 p-6 text-white">
-      <h1 className="text-3xl font-bold text-center mb-8">📝 Task Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-blue-950 px-6 pt-24 pb-6 text-white">
+  <h1 className="text-3xl font-bold text-center mb-8">📝 Task Dashboard</h1>
 
-      <FilterBar
-        search={search}
-        setSearch={setSearch}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-      />
+  <FilterBar
+    search={search}
+    setSearch={setSearch}
+    statusFilter={statusFilter}
+    setStatusFilter={setStatusFilter}
+  />
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredTasks.map((task) => (
-          <TaskCard
-            key={task._id}
-            task={task}
-            onEdit={() => {
-              setSelectedTask(task);
-              setShowModal("edit");
-            }}
-            onDelete={() => {
-              setSelectedTaskId(task._id);
-              setShowConfirm(true);
-            }}
-            onShowDescription={() => {
-              setSelectedTask(task);
-              setShowModal("description");
-            }}
-          />
-        ))}
-      </div>
-
-      <AnimatePresence>
-        {showModal === "description" && selectedTask && (
-          <Description
-            task={selectedTask}
-            onClose={() => {
-              setShowModal(null);
-              setSelectedTask(null);
-            }}
-          />
-        )}
-        {showModal === "edit" && selectedTask && (
-          <EditTaskModal
-            task={selectedTask}
-            onClose={() => {
-              setShowModal(null);
-              setSelectedTask(null);
-            }}
-            setTasks={setTasks}
-            user={user}
-          />
-        )}
-      </AnimatePresence>
-
-      <ConfirmDialog
-        isOpen={showConfirm}
-        message="Are you sure you want to delete this task?"
-        onCancel={() => {
-          setShowConfirm(false);
-          setSelectedTaskId(null);
+  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {filteredTasks.map((task) => (
+      <TaskCard
+        key={task._id}
+        task={task}
+        onEdit={() => {
+          setSelectedTask(task);
+          setShowModal("edit");
         }}
-        onConfirm={async () => {
-          setShowConfirm(false);
-          if (selectedTaskId) {
-            await deleteTask(selectedTaskId, user, setTasks);
-            setSelectedTaskId(null);
-          }
+        onDelete={() => {
+          setSelectedTaskId(task._id);
+          setShowConfirm(true);
+        }}
+        onShowDescription={() => {
+          setSelectedTask(task);
+          setShowModal("description");
         }}
       />
-    </div>
+    ))}
+  </div>
+
+  <AnimatePresence>
+    {showModal === "description" && selectedTask && (
+      <Description
+        task={selectedTask}
+        onClose={() => {
+          setShowModal(null);
+          setSelectedTask(null);
+        }}
+      />
+    )}
+    {showModal === "edit" && selectedTask && (
+      <EditTaskModal
+        task={selectedTask}
+        onClose={() => {
+          setShowModal(null);
+          setSelectedTask(null);
+        }}
+        setTasks={setTasks}
+        user={user}
+      />
+    )}
+  </AnimatePresence>
+
+  <ConfirmDialog
+    isOpen={showConfirm}
+    message="Are you sure you want to delete this task?"
+    onCancel={() => {
+      setShowConfirm(false);
+      setSelectedTaskId(null);
+    }}
+    onConfirm={async () => {
+      setShowConfirm(false);
+      if (selectedTaskId) {
+        await deleteTask(selectedTaskId, user, setTasks);
+        setSelectedTaskId(null);
+      }
+    }}
+  />
+</div>
+
   );
 };
 
