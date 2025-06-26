@@ -2,10 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Navbar from "./components/Navbar";
-import PrivateRoute from "./components/PrivateRoute";
+import Navbar from "./Components/Navbar";
+import PrivateRoute from "./Components/PrivateRoute";
 import CreateTask from "./pages/CreateTask";
-import EditTask from "./pages/EditTask";
 
 const App = () => {
   return (
@@ -30,14 +29,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/edit/:id"
-          element={
-            <PrivateRoute>
-              <EditTask />
-            </PrivateRoute>
-          }
-        />
+        {/* Removed the /edit/:id route — EditTask will be rendered as a modal in Dashboard */}
       </Routes>
     </Router>
   );
