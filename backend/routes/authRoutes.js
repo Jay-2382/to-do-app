@@ -1,14 +1,24 @@
 import express from 'express';
+// import { sendOTP, verifyOTP } from "../controllers/authController.js";
 import {
   registerUser,
   loginUser,
   getMe,
-  logoutUser
+  logoutUser,
+  verifyOtp
 } from '../controllers/authController.js';
+
+import {resendOTP} from '../utils/resendOTPEmail.js'
 
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+
+router.post('/verify-otp', verifyOtp); // ✅ correct case
+
+router.post('/resend-otp', resendOTP); // ✅ New route
+
 
 // @route   POST /api/users/register
 router.post('/register', registerUser);
