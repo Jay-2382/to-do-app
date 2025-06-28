@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 
 export const sendOTPEmail = async (toEmail, otp) => {
   try {
-
+console.log("send otp:",otp);
     const transporter = nodemailer.createTransport({
       service: "Gmail", // Or use smtp.ethereal.email for testing
       auth: {

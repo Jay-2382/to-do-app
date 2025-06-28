@@ -29,6 +29,7 @@ export const registerUser = async (req, res) => {
       password,
       otp,
       otpExpiry,
+      
     });
 
     // ✅ Send OTP email
@@ -46,12 +47,16 @@ export const registerUser = async (req, res) => {
 
 
 
-
+// @desc    Logout user (optional placeholder)
+// @route   POST /api/users/logout
+// @access  Public (or just handled on frontend)
 export const logoutUser = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-
+// @desc    Login user
+// @route   POST /api/auth/login
+// @access  Public
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -94,7 +99,9 @@ export const loginUser = async (req, res) => {
   }
 };
 
-
+// @desc    Get current logged-in user
+// @route   GET /api/users/me
+// @access  Private
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -114,9 +121,9 @@ export const getMe = async (req, res) => {
 
 // @desc    Verify OTP and activate account
 // @route   POST /api/users/verify-otp
-
+// @access  Public
 export const verifyOtp = async (req, res) => {
-  console.log('req.body:', req.body);
+  
 
   const { email, otp } = req.body;
 
@@ -139,9 +146,10 @@ export const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: 'OTP expired. Please request a new one.' });
     }
 
-    if (user.otp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP' });
-    }
+    if (user.otp.toString() !== otp.toString()) {
+  return res.status(400).json({ message: 'Invalid OTP' });
+}
+
 
     // OTP is valid
     user.isVerified = true;

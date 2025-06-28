@@ -1,5 +1,5 @@
 import express from 'express';
-
+// import { sendOTP, verifyOTP } from "../controllers/authController.js";
 import {
   registerUser,
   loginUser,

@@ -16,12 +16,12 @@ export const resendOTP = async (req, res) => {
     // Generate new OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
-
+    console.log("reswnt otp: ",otp);
     user.otp = otp;
     user.otpExpiry = otpExpiry;
     await user.save();
 
-    
+    // ✅ FIX: Use sendOTPEmail instead of generic sendEmail
     await sendOTPEmail(user.email, otp);
 
     res.status(200).json({ message: 'OTP resent successfully' });
