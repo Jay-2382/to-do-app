@@ -21,7 +21,7 @@ export const resendOTP = async (req, res) => {
     user.otpExpiry = otpExpiry;
     await user.save();
 
-    // ✅ FIX: Use sendOTPEmail instead of generic sendEmail
+    
     await sendOTPEmail(user.email, otp);
 
     res.status(200).json({ message: 'OTP resent successfully' });

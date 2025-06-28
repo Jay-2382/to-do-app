@@ -33,9 +33,9 @@
 
 import express from 'express';
 
-import mongoose from 'mongoose';
-import cors from 'cors';
 
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import connectDB from './config/db.js';
@@ -52,7 +52,7 @@ app.use(cors({
 }));
 
 app.use(express.json()); // For JSON request bodies
-
+app.use(cookieParser());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);

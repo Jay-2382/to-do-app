@@ -3,10 +3,10 @@ import nodemailer from "nodemailer";
 export const sendOTPEmail = async (toEmail, otp) => {
   try {
     const transporter = nodemailer.createTransport({
-      service: "Gmail", // Or use smtp.ethereal.email for testing
+      service: "Gmail", 
       auth: {
-        user: process.env.EMAIL_USER,     // Your email (e.g., Gmail)
-        pass: process.env.EMAIL_PASSWORD, // Your email password or App password
+        user: process.env.EMAIL_USER,     
+        pass: process.env.EMAIL_PASSWORD, 
       },
     });
 
