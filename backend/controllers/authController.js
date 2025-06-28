@@ -3,43 +3,47 @@ import generateToken from '../utils/generateToken.js';
 import User from '../models/userModel.js';
 import sendOTPEmail from '../utils/sendOTPEmail.js';
 
-// @desc    Register new user
-// @route   POST /api/users/register
-// @access  Public
+
+
 export const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
-
   try {
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please enter all fields' });
-    }
+    const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
+    let user = await User.findOne({ email });
 
-    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-      otp,
-      otpExpiry,
-      
-    });
+    if (user) {
+      if (user.isVerified) {
+        return res.status(400).json({ message: 'User already exists' });
+      } else {
+        //  Update OTP if user is not verified
+        user.otp = otp;
+        user.otpExpiry = otpExpiry;
+        await user.save();
+      }
+    } else {
+      //  Create new user
+      user = await User.create({
+        name,
+        email,
+        password,
+        otp,
+        otpExpiry,
+        isVerified: false,
+      });
+    }
 
-    // ✅ Send OTP email
+    
     await sendOTPEmail(email, otp);
 
     res.status(201).json({
-      message: 'User registered. OTP sent to email for verification.',
+      message: 'OTP sent to email for verification',
       userId: user._id,
       email: user.email,
     });
+
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server Error' });
   }
@@ -47,16 +51,12 @@ export const registerUser = async (req, res) => {
 
 
 
-// @desc    Logout user (optional placeholder)
-// @route   POST /api/users/logout
-// @access  Public (or just handled on frontend)
+
 export const logoutUser = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -99,9 +99,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Get current logged-in user
-// @route   GET /api/users/me
-// @access  Private
+
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -117,15 +115,9 @@ export const getMe = async (req, res) => {
 
 
 
-
-
-// @desc    Verify OTP and activate account
-// @route   POST /api/users/verify-otp
-// @access  Public
 export const verifyOtp = async (req, res) => {
-  
-
-  const { email, otp } = req.body;
+  const email = req.body.email?.trim();
+  const otp = req.body.otp?.trim();
 
   try {
     if (!email || !otp) {
@@ -142,22 +134,21 @@ export const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: 'User already verified' });
     }
 
-    if (!user.otp || !user.otpExpiry || user.otpExpiry < Date.now()) {
+    if (!user.otp || !user.otpExpiry || new Date(user.otpExpiry).getTime() < Date.now()) {
       return res.status(400).json({ message: 'OTP expired. Please request a new one.' });
     }
 
     if (user.otp.toString() !== otp.toString()) {
-  return res.status(400).json({ message: 'Invalid OTP' });
-}
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
 
-
-    // OTP is valid
+    // ✅ OTP is valid
     user.isVerified = true;
     user.otp = null;
     user.otpExpiry = null;
     await user.save();
 
-    const token = generateToken(user._id); // generate JWT
+    const token = generateToken(user._id);
 
     res.status(200).json({
       message: 'Email verified successfully',
@@ -173,4 +164,3 @@ export const verifyOtp = async (req, res) => {
     res.status(500).json({ message: error.message || 'Server Error' });
   }
 };
-

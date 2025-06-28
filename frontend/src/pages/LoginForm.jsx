@@ -22,6 +22,7 @@ const LoginForm = ({ switchToRegister }) => {
       });
       localStorage.setItem("user", JSON.stringify(res.data));
       setUser(res.data);
+      toast.success("Login successful");
     } catch (err) {
       toast.warning(err.response?.data?.message || "Login failed");
     } finally {
@@ -38,6 +39,7 @@ const LoginForm = ({ switchToRegister }) => {
         required
         onChange={(e) => setEmail(e.target.value)}
         className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        autocomplete="off"
       />
       <input
         type="password"
@@ -46,6 +48,7 @@ const LoginForm = ({ switchToRegister }) => {
         required
         onChange={(e) => setPassword(e.target.value)}
         className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        autocomplete="off"
       />
       <button
         type="submit"
