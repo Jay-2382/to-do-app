@@ -27,7 +27,7 @@ const CreateTask = () => {
           },
         }
       );
-      navigate("/"); // Redirect to Dashboard
+      navigate("/dashboard"); // Redirect to Dashboard
     } catch (err) {
       console.error("Create task error:", err.response?.data || err.message);
       alert(

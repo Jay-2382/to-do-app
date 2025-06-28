@@ -4,5 +4,16 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(),tailwindcss(),],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      boxShadow: {
+        glow: '0 0 15px rgba(59,130,246,0.6)',
+      },
+    },
+  },
+  plugins: [react(),tailwindcss()],
 })
