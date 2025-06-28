@@ -6,6 +6,7 @@ import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { motion } from "framer-motion"; 
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const login = () => {
   const { user } = useAuth();

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+import { toast } from "react-toastify";
+
 const RegisterForm = ({ switchToLogin }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -33,7 +35,7 @@ const RegisterForm = ({ switchToLogin }) => {
       setShowOtpField(true);
       setResendTimer(60); // Start timer
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      toast.warning(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -41,19 +43,21 @@ const RegisterForm = ({ switchToLogin }) => {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    if (!otp) return alert("Please enter OTP");
+    if (!otp) return toast.info("Please enter OTP");
 
     try {
       setLoading(true);
+      console.log("Sending OTP verify payload:", { email, otp });
       await axios.post("http://localhost:1000/api/auth/verify-otp", {
         email,
         otp,
       });
+      
 
-      alert("Registered successfully!");
+      toast.success("Registered successfully!");
       switchToLogin(); // Go to login modal
     } catch (err) {
-      alert(err.response?.data?.message || "OTP verification failed");
+      toast.info(err.response?.data?.message || "OTP verification failed");
     } finally {
       setLoading(false);
     }
@@ -63,7 +67,7 @@ const RegisterForm = ({ switchToLogin }) => {
     try {
       setLoading(true);
       await axios.post("http://localhost:1000/api/auth/resend-otp", { email });
-      alert("OTP resent to your email");
+      toast.success("OTP resent to your email");
       setResendTimer(60); // Reset timer
     } catch (err) {
       alert(err.response?.data?.message || "Failed to resend OTP");

@@ -9,16 +9,17 @@ const Navbar = () => {
 
   const location = useLocation();
   const pathname = window.location.pathname;
-  const visiblePaths = [ "/create", "/create-task", "/dashboard"];
-
-  if (!visiblePaths.includes(pathname)) {
-    return null;
-  }
+  
 
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const visiblePaths = [ "/create", "/create-task", "/dashboard"];
+  if (!visiblePaths.includes(pathname)) {
+    return null;
+  }
 
   const handleLogout = () => {
     setShowConfirm(true);

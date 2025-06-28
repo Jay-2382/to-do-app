@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const CreateTask = () => {
   const { user } = useAuth();
@@ -30,7 +31,7 @@ const CreateTask = () => {
       navigate("/dashboard"); // Redirect to Dashboard
     } catch (err) {
       console.error("Create task error:", err.response?.data || err.message);
-      alert(
+      toast.warning(
         "Task creation failed: " + (err.response?.data?.message || err.message)
       );
     }

@@ -51,7 +51,7 @@ const Home = () => {
           onClick={handleStartClick}
           className="mt-10 px-8 py-3 text-lg bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition duration-300 ease-in-out glow"
         >
-          Let’s Get Started →
+          Let's Get Started →
         </motion.button>
 
         <div className="mt-4 text-sm text-gray-400 tracking-wider">

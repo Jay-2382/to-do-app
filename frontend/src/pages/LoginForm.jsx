@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const LoginForm = ({ switchToRegister }) => {
   const { setUser } = useAuth();
@@ -11,7 +12,7 @@ const LoginForm = ({ switchToRegister }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) return alert("Please fill in all fields");
+    if (!email || !password) return toast.warning("Please fill in all fields");
 
     try {
       setLoading(true);
@@ -22,7 +23,7 @@ const LoginForm = ({ switchToRegister }) => {
       localStorage.setItem("user", JSON.stringify(res.data));
       setUser(res.data);
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      toast.warning(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
