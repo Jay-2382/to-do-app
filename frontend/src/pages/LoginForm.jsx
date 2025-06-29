@@ -1,10 +1,10 @@
-// src/pages/LoginForm.jsx
+
 import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
-const LoginForm = ({ switchToRegister }) => {
+const LoginForm = ({ switchToRegister, switchToForgot }) => {
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +39,7 @@ const LoginForm = ({ switchToRegister }) => {
         required
         onChange={(e) => setEmail(e.target.value)}
         className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        autocomplete="off"
+        autoComplete="off"
       />
       <input
         type="password"
@@ -48,7 +48,7 @@ const LoginForm = ({ switchToRegister }) => {
         required
         onChange={(e) => setPassword(e.target.value)}
         className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        autocomplete="off"
+        autoComplete="off"
       />
       <button
         type="submit"
@@ -56,8 +56,17 @@ const LoginForm = ({ switchToRegister }) => {
       >
         {loading ? "Logging in..." : "Login"}
       </button>
+
+      {/* ✅ Forgot Password Link */}
+      <p
+        className="text-sm text-center text-blue-600 cursor-pointer hover:underline"
+        onClick={switchToForgot}
+      >
+        Forgot Password?
+      </p>
     </form>
   );
 };
 
 export default LoginForm;
+

@@ -21,6 +21,9 @@ This is a full-stack Task Management App built using the MERN stack (MongoDB, Ex
 
     3. User Login & Logout
       Authenticated users can log in and log out with token-based session persistence.
+    
+    4. Reset password
+        User can reset their forget password
 
     4. Protected Routes
       Access to the dashboard and task management routes is restricted to authenticated users.
@@ -49,32 +52,64 @@ This is a full-stack Task Management App built using the MERN stack (MongoDB, Ex
 
 # API ENDPOINTS
 
-  ## Authentication
 
-      `POST	/api/auth/register	     Register a user and send OTP to email`
 
-      `GET   /api/auth/me            Get current logged-in user's info (requires token)`
+  ##  Authentication API
 
-      `POST	/api/auth/verify-otp	   Verify OTP and complete registration`
+  ### POST `/api/auth/register`  
 
-      `POST	/api/auth/login	         Log in with email and password`
+        -Register a user and send OTP to email.
 
-      `POST	/api/auth/logout	       Log out the user`
+  ### GET `/api/auth/me`  
 
-## Tasks (Protected - Requires Bearer Token)
+        -Get current logged-in user's info (requires token).
 
-      `Method	Endpoint Description`
+  ### POST `/api/auth/verify-otp`  
+      
+        -Verify OTP and complete registration.
 
-        `GET	/api/tasks	        Get all tasks for the logged-in user`
+   ### POST `/api/auth/login`  
+      
+      -Log in with email and password.
 
-        `GET /api/tasks/:id         Filter Task by Id`
+  ### POST `/api/auth/logout`  
+      
+      -Log out the user.
 
-        `POST	/api/tasks	           Create a new task`
 
-        `PUT	/api/tasks/:id       	Update a specific task`
 
-        `DELETE	/api/tasks/:id     	Delete a specific task`
+##  Tasks API (Protected – Requires Bearer Token)
 
+### GET `/api/tasks` 
+
+      -Get all tasks for the logged-in user.
+
+### GET `/api/tasks/:id`  
+
+      -Get a specific task by ID.
+
+### POST `/api/tasks`
+
+      -Create a new task.
+
+### PUT `/api/tasks/:id`
+
+      -Update a specific task.
+
+### DELETE `/api/tasks/:id`  
+      -Delete a specific task.
+
+
+
+
+##  Forgot Password API
+
+  ### POST `/api/auth/forgot-password`
+
+        - Sends OTP to user’s email for password reset.
+
+  ### POST `/api/auth/reset-password`
+          Resets the password using valid OTP.
 
 # Installation & Setup
 

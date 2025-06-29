@@ -1,5 +1,10 @@
 import express from 'express';
-// import { sendOTP, verifyOTP } from "../controllers/authController.js";
+
+import {
+  forgotPassword,
+  verifyResetOtp,
+} from '../controllers/authController.js';
+
 import {
   registerUser,
   loginUser,
@@ -31,5 +36,8 @@ router.post('/logout', logoutUser);
 
 // @route   GET /api/users/me (Protected)
 router.get('/me', protect, getMe);
+
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', verifyResetOtp);
 
 export default router;

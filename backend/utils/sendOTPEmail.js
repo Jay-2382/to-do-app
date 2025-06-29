@@ -1,21 +1,30 @@
+
+
 import nodemailer from "nodemailer";
 
-export const sendOTPEmail = async (toEmail, otp) => {
+export const sendOTPEmail = async (toEmail, otp, subject = "Your OTP Code") => {
   try {
-console.log("send otp:",otp);
     const transporter = nodemailer.createTransport({
-      service: "Gmail", // Or use smtp.ethereal.email for testing
+      service: "Gmail",
       auth: {
-        user: process.env.EMAIL_USER,     // Your email (e.g., Gmail)
-        pass: process.env.EMAIL_PASSWORD, // Your email password or App password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
       },
     });
 
     const mailOptions = {
       from: `"TaskApp" <${process.env.EMAIL_USER}>`,
       to: toEmail,
-      subject: "Your OTP Code for Registration",
-      html: `<p>Your OTP code is: <b>${otp}</b></p><p>It expires in 5 minutes.</p>`,
+      subject,
+      html: `
+        <div style="font-family: sans-serif; line-height: 1.5;">
+          <h2 style="color: #333;">🔐 Your OTP Code</h2>
+          <p>Your One-Time Password (OTP) is:</p>
+          <h3 style="background: #f4f4f4; padding: 10px; border-radius: 5px;">${otp}</h3>
+          <p>This code will expire in <b>5 minutes</b>.</p>
+          <p>If you did not request this, please ignore this email.</p>
+        </div>
+      `,
     };
 
     await transporter.sendMail(mailOptions);
@@ -25,4 +34,8 @@ console.log("send otp:",otp);
     throw error;
   }
 };
-export default sendOTPEmail
+
+export default sendOTPEmail;
+
+
+
